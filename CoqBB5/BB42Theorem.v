@@ -4,7 +4,7 @@ Require Import Logic.FunctionalExtensionality.
 Require Import Lia.
 Require Import FSets.FMapPositive.
 
-From CoqBB5 Require Import BB42Statement.v.
+From CoqBB5 Require Import BB42Statement.
 
 Set Warnings "-abstract-large-number".
 
@@ -498,6 +498,9 @@ Proof.
 Qed.
 
 Section TM.
+
+Hypothesis Σ:Set.
+Hypothesis Σ0:Σ.
 
 Definition HaltsAt(tm:TM)(n:nat)(st:ExecState): Prop :=
   exists st', Steps tm n st st' /\ step tm st' = None.
