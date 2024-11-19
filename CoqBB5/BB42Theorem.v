@@ -4,6 +4,8 @@ Require Import Logic.FunctionalExtensionality.
 Require Import Lia.
 Require Import FSets.FMapPositive.
 
+From CoqBB5 Require Import BB42Statement.v.
+
 Set Warnings "-abstract-large-number".
 
 Ltac invst H := inversion H; subst.
@@ -292,11 +294,7 @@ Qed.
 
 
 
-Inductive St:Set :=
-| St0
-| St1
-| St2
-| St3.
+
 
 
 Definition St_enc(x:St):positive :=
@@ -335,9 +333,7 @@ Ltac St_eq_dec s1 s2 :=
 
 
 
-Inductive Σ:Set :=
-| Σ0
-| Σ1.
+
 
 Definition Σ_eqb(i1 i2:Σ) :=
 match i1,i2 with
@@ -409,15 +405,9 @@ Proof.
 Qed.
 
 
-Inductive Dir:Set :=
-| Dneg
-| Dpos.
 
-Definition Dir_to_Z(x:Dir) :=
-match x with
-| Dneg => Zneg 1
-| Dpos => Zpos 1
-end.
+
+
 
 Definition Dir_rev(d:Dir) :=
 match d with
@@ -507,49 +497,7 @@ Proof.
   - apply H.
 Qed.
 
-
-
-
-
 Section TM.
-
-Hypothesis Σ:Set.
-Hypothesis Σ0:Σ.
-
-Record Trans:Set := {
-  nxt: St;
-  dir: Dir;
-  out: Σ;
-}.
-
-Definition TM:Set := St->Σ->option Trans.
-
-Definition ExecState:Set := St*(Z->Σ).
-
-Definition InitES:ExecState := (St0,fun _=>Σ0).
-
-Definition upd(t:(Z->Σ))(o:Σ) :=
-  fun x:Z => if Z.eqb x Z0 then o else t x.
-
-Definition mov(t:(Z->Σ))(d:Dir) :=
-  fun x:Z => t ((x+(Dir_to_Z d))%Z).
-
-Definition step(tm:TM)(st:ExecState): option ExecState :=
-  let (s,t):=st in
-  match tm s (t Z0) with
-  | None => None
-  | Some tr =>
-    let (s',d,o):=tr in
-    Some (s',mov (upd t o) d)
-  end.
-
-Inductive Steps: TM->nat->ExecState->ExecState->Prop :=
-| steps_O tm st:
-  Steps tm O st st
-| steps_S tm n st st0 st1:
-  Steps tm n st st0 ->
-  step tm st0 = Some st1 ->
-  Steps tm (S n) st st1.
 
 Definition HaltsAt(tm:TM)(n:nat)(st:ExecState): Prop :=
   exists st', Steps tm n st st' /\ step tm st' = None.

@@ -140,14 +140,15 @@ BB(4)=107 is proved in `BB42Theorem.v`. We only use `loop1_decider, NGramCPS_dec
 This file doesn't depend on other files and can be compiled directly:
 
 ```
-coqc -Q . BusyCoq BB42Theorem.v
+coqc -Q . CoqBB5 BB42Statement.v
+coqc -Q . CoqBB5 BB42Theorem.v
 ```
 
 ## BB(2,4)
 
 BB(2,4) is the maximum steps to halt for all TM with $|St|=2$ and $\Sigma=\{0,1,2,3\}$ and starts from empty tape.
 
-BB(2,4)=3932964 is proved in `BB24Theorem.v`. We only use `loop1_decider, NGramCPS_decider, RepWL_ES_decider` for BB(2,4).
+BB(2,4)=3,932,964 is proved in `BB24Theorem.v`. We only use `loop1_decider, NGramCPS_decider, RepWL_ES_decider` for BB(2,4).
 
 This file doesn't depend on other files and can be compiled directly:
 
