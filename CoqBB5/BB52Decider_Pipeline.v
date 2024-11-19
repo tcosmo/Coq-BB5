@@ -15,36 +15,28 @@ From CoqBB5 Require Import Decider_NGramCPS.
 From CoqBB5 Require Import Decider_RepWL.
 From CoqBB5 Require Import Decider_Verifier_FAR.
 From CoqBB5 Require Import Decider_Verifier_FAR_MITM_WDFA.
-From CoqBB5 Require Import Sporadic_NonHalt.
+From CoqBB5 Require Import BB52Sporadic_NonHalt.
 
 Set Warnings "-abstract-large-number".
 
-Definition halt_time_verifier(tm:TM Σ)(n:nat):bool :=
-  match ListES_Steps tm n {| ListTape.l := nil; ListTape.r := nil; ListTape.m := Σ0; ListTape.s := St0 |} with
-  | Some {| ListTape.l:=_; ListTape.r:=_; ListTape.m :=m0; ListTape.s :=s0 |} =>
-    match tm s0 m0 with
-    | None => true
-    | _ => false
-    end
-  | None => false
-  end.
-
-Lemma halt_time_verifier_spec tm n:
-  halt_time_verifier tm n = true ->
-  HaltsAt _ tm n (InitES Σ Σ0).
+Definition halt_decider_max := halt_decider (N.to_nat BB5).
+Lemma halt_decider_max_spec: HaltDecider_WF (N.to_nat BB5_minus_one) halt_decider_max.
 Proof.
-  unfold halt_time_verifier,HaltsAt.
-  intro H.
-  pose proof (ListES_Steps_spec tm n {| ListTape.l := nil; ListTape.r := nil; ListTape.m := Σ0; ListTape.s := St0 |}).
-  destruct (ListES_Steps tm n {| ListTape.l := nil; ListTape.r := nil; ListTape.m := Σ0; ListTape.s := St0 |}).
-  2: cg.
-  rewrite ListES_toES_O in H0.
-  eexists.
-  split.
-  - apply H0.
-  - destruct l as [l0 r0 m0 s0].
-    cbn.
-    destruct (tm s0 m0); cg.
+  eapply halt_decider_WF.
+  unfold BB5_minus_one.
+  replace (S (N.to_nat 47176869)) with (N.to_nat 47176870) by lia.
+  replace (Init.Nat.of_num_uint
+    (Number.UIntDecimal
+       (Decimal.D4
+          (Decimal.D7
+             (Decimal.D1
+                (Decimal.D7 (Decimal.D6 (Decimal.D8 (Decimal.D7 (Decimal.D0 Decimal.Nil))))))))))
+  with (N.to_nat 47176870).
+  1: apply Nat.le_refl.
+  symmetry.
+  apply nat_eqb_N_spec.
+  vm_compute.
+  reflexivity.
 Qed.
 
 
@@ -230,31 +222,31 @@ Proof.
   intros.
   cbn in H.
   destruct H as [H|H].
-  1: subst; apply Sporadic_NonHalt.Finned1_nonhalt.
+  1: subst; apply BB52Sporadic_NonHalt.Finned1_nonhalt.
   destruct H as [H|H].
-  1: subst; apply Sporadic_NonHalt.Finned2_nonhalt.
+  1: subst; apply BB52Sporadic_NonHalt.Finned2_nonhalt.
   destruct H as [H|H].
-  1: subst; apply Sporadic_NonHalt.Finned3_nonhalt.
+  1: subst; apply BB52Sporadic_NonHalt.Finned3_nonhalt.
   destruct H as [H|H].
-  1: subst; apply Sporadic_NonHalt.Finned4_nonhalt.
+  1: subst; apply BB52Sporadic_NonHalt.Finned4_nonhalt.
   destruct H as [H|H].
-  1: subst; apply Sporadic_NonHalt.Finned5_nonhalt.
+  1: subst; apply BB52Sporadic_NonHalt.Finned5_nonhalt.
   destruct H as [H|H].
-  1: subst; apply Sporadic_NonHalt.Skelet1_nonhalt.
+  1: subst; apply BB52Sporadic_NonHalt.Skelet1_nonhalt.
   destruct H as [H|H].
-  1: subst; apply Sporadic_NonHalt.Skelet10_nonhalt.
+  1: subst; apply BB52Sporadic_NonHalt.Skelet10_nonhalt.
   destruct H as [H|H].
-  1: subst; apply Sporadic_NonHalt.Skelet15_nonhalt.
+  1: subst; apply BB52Sporadic_NonHalt.Skelet15_nonhalt.
   destruct H as [H|H].
-  1: subst; apply Sporadic_NonHalt.Skelet17_nonhalt.
+  1: subst; apply BB52Sporadic_NonHalt.Skelet17_nonhalt.
   destruct H as [H|H].
-  1: subst; apply Sporadic_NonHalt.Skelet26_nonhalt.
+  1: subst; apply BB52Sporadic_NonHalt.Skelet26_nonhalt.
   destruct H as [H|H].
-  1: subst; apply Sporadic_NonHalt.Skelet33_nonhalt.
+  1: subst; apply BB52Sporadic_NonHalt.Skelet33_nonhalt.
   destruct H as [H|H].
-  1: subst; apply Sporadic_NonHalt.Skelet34_nonhalt.
+  1: subst; apply BB52Sporadic_NonHalt.Skelet34_nonhalt.
   destruct H as [H|H].
-  1: subst; apply Sporadic_NonHalt.Skelet35_nonhalt.
+  1: subst; apply BB52Sporadic_NonHalt.Skelet35_nonhalt.
   contradiction.
 Qed.
 

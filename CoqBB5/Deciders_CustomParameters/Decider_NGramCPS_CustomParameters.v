@@ -2,7 +2,7 @@ Require Import List.
 
 From CoqBB5 Require Import BB52Statement.
 From CoqBB5 Require Import TM.
-From CoqBB5 Require Import Decider_Pipeline.
+From CoqBB5 Require Import BB52Decider_Pipeline.
 
 
 Definition tm_NG0:list ((TM Σ)*(DeciderType)) :=

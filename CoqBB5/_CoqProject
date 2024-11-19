@@ -13,8 +13,8 @@ TM.v
 TNF.v
 ListTape.v
 Skelet17.v
-Sporadic_NonHalt.v
-Decider_Pipeline.v
+BB52Sporadic_NonHalt.v
+BB52Decider_Pipeline.v
 
 Deciders/Decider_Halt.v
 Deciders/Decider_Loop.v

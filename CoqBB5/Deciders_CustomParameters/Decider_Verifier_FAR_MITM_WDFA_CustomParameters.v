@@ -3,7 +3,7 @@ Require Import ZArith.
 
 From CoqBB5 Require Import TM.
 From CoqBB5 Require Import Decider_Verifier_FAR_MITM_WDFA.
-From CoqBB5 Require Import Decider_Pipeline.
+From CoqBB5 Require Import BB52Decider_Pipeline.
 
 Notation "( a , b ; c , d )" := (a%nat,b%Z,c%nat,d%Z).
 

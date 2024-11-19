@@ -11,7 +11,7 @@ From CoqBB5 Require Export TM.
 From CoqBB5 Require Export Prelims.
 From CoqBB5 Require Export Encodings.
 From CoqBB5 Require Export CustomTactics.
-From CoqBB5 Require Export Decider_Pipeline.
+From CoqBB5 Require Export BB52Decider_Pipeline.
 
 
 From CoqBB5 Require Export Deciders.Decider_Loop.
@@ -27,7 +27,7 @@ From CoqBB5 Require Export Deciders_CustomParameters.Decider_Halt_CustomParamete
 
 
 
-From CoqBB5 Require Export Sporadic_NonHalt.
+From CoqBB5 Require Export BB52Sporadic_NonHalt.
 
 
 Definition check_tms(ls:list ((TM Σ)*DeciderType)):=

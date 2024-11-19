@@ -110,23 +110,32 @@ Proof.
       specialize (IHn (Pos.pred_N p) H). lia.
 Qed.
 
-Definition halt_decider_max := halt_decider 47176870.
-Lemma halt_decider_max_spec: HaltDecider_WF (N.to_nat BB5_minus_one) halt_decider_max.
+Definition halt_time_verifier(tm:TM Σ)(n:nat):bool :=
+  match ListES_Steps tm n {| ListTape.l := nil; ListTape.r := nil; ListTape.m := Σ0; ListTape.s := St0 |} with
+  | Some {| ListTape.l:=_; ListTape.r:=_; ListTape.m :=m0; ListTape.s :=s0 |} =>
+    match tm s0 m0 with
+    | None => true
+    | _ => false
+    end
+  | None => false
+  end.
+
+Lemma halt_time_verifier_spec tm n:
+  halt_time_verifier tm n = true ->
+  HaltsAt _ tm n (InitES Σ Σ0).
 Proof.
-  eapply halt_decider_WF.
-  unfold BB5_minus_one.
-  replace (S (N.to_nat 47176869)) with (N.to_nat 47176870) by lia.
-  replace (Init.Nat.of_num_uint
-    (Number.UIntDecimal
-       (Decimal.D4
-          (Decimal.D7
-             (Decimal.D1
-                (Decimal.D7 (Decimal.D6 (Decimal.D8 (Decimal.D7 (Decimal.D0 Decimal.Nil))))))))))
-  with (N.to_nat 47176870).
-  1: apply Nat.le_refl.
-  symmetry.
-  apply nat_eqb_N_spec.
-  vm_compute.
-  reflexivity.
+  unfold halt_time_verifier,HaltsAt.
+  intro H.
+  pose proof (ListES_Steps_spec tm n {| ListTape.l := nil; ListTape.r := nil; ListTape.m := Σ0; ListTape.s := St0 |}).
+  destruct (ListES_Steps tm n {| ListTape.l := nil; ListTape.r := nil; ListTape.m := Σ0; ListTape.s := St0 |}).
+  2: cg.
+  rewrite ListES_toES_O in H0.
+  eexists.
+  split.
+  - apply H0.
+  - destruct l as [l0 r0 m0 s0].
+    cbn.
+    destruct (tm s0 m0); cg.
 Qed.
+
 
