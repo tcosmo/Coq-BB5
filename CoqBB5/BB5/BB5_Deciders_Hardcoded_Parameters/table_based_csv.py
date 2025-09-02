@@ -43,7 +43,8 @@ def parse_makeTM_line(line: str) -> Optional[Tuple[str, str, Optional[int], Opti
         decider_type = match.group(2)
         param1 = int(match.group(3))
         param2 = int(match.group(4))
-        return (mxdys_to_bbchallenge(tm_def), decider_type, param1, param2)
+        status = "halt" if decider_type == "Ha" else "nonhalt"
+        return (mxdys_to_bbchallenge(tm_def), status, decider_type, param1, param2)
     
     # Try pattern with one parameter
     match = re.search(pattern_one_param, line)
@@ -51,14 +52,16 @@ def parse_makeTM_line(line: str) -> Optional[Tuple[str, str, Optional[int], Opti
         tm_def = match.group(1).strip()
         decider_type = match.group(2)
         param1 = int(match.group(3))
-        return (mxdys_to_bbchallenge(tm_def), decider_type, param1, None)
+        status = "halt" if decider_type == "Ha" else "nonhalt"
+        return (mxdys_to_bbchallenge(tm_def), status, decider_type, param1, None)
     
     # Try pattern without parameters
     match = re.search(pattern_no_params, line)
     if match:
         tm_def = match.group(1).strip()
         decider_type = match.group(2)
-        return (mxdys_to_bbchallenge(tm_def), decider_type, None, None)
+        status = "halt" if decider_type == "Ha" else "nonhalt"
+        return (mxdys_to_bbchallenge(tm_def), status, decider_type, None, None)
     
     return None
 
@@ -108,7 +111,7 @@ def parse_verifier_far_file(content: str) -> List[Tuple[str, str, Optional[int],
         tm_def = match.group(1).strip()
         # Remove newlines and extra spaces
         tm_def = re.sub(r'\s+', ' ', tm_def)
-        results.append((mxdys_to_bbchallenge(tm_def), 'FAR', None, None))
+        results.append((mxdys_to_bbchallenge(tm_def), 'nonhalt', 'FAR_certificates', None, None))
     
     return results
 
@@ -127,7 +130,7 @@ def parse_verifier_wfar_file(content: str) -> List[Tuple[str, str, Optional[int]
         tm_def = match.group(1).strip()
         # Remove newlines and extra spaces
         tm_def = re.sub(r'\s+', ' ', tm_def)
-        results.append((mxdys_to_bbchallenge(tm_def), 'WFAR', None, None))
+        results.append((mxdys_to_bbchallenge(tm_def), 'nonhalt', 'WFAR_certificates', None, None))
     
     return results
 
@@ -150,8 +153,8 @@ def parse_sporadic_machines_file(filepath: str) -> List[Tuple[str, str, Optional
                 tm_def = match.group(1).strip()
                 # Remove newlines and extra spaces
                 tm_def = re.sub(r'\s+', ' ', tm_def)
-                results.append((mxdys_to_bbchallenge(tm_def), 'SPORADIC_MACHINE', None, None))
-                
+                results.append((mxdys_to_bbchallenge(tm_def), 'nonhalt', 'SPORADIC_MACHINES', None, None))
+
     except Exception as e:
         print(f"Error reading sporadic machines file {filepath}: {e}")
     
@@ -207,33 +210,52 @@ def main():
         # Show first few examples from this file
         if results:
             print("  Examples:")
-            for i, (tm_def, decider_type, param1, param2) in enumerate(results[:3]):
+            for i, (tm_def, status, decider_type, param1, param2) in enumerate(results[:3]):
                 if param1 is not None and param2 is not None:
-                    print(f"    \"{tm_def}\", \"{decider_type}\", {param1}, {param2}")
+                    print(f"    \"{tm_def}\", \"{status}\", \"{decider_type}\", {param1}, {param2}")
                 else:
-                    print(f"    \"{tm_def}\", \"{decider_type}\"")
+                    print(f"    \"{tm_def}\", \"{status}\", \"{decider_type}\"")
         print()
     
     # Write results to CSV
-    csv_filename = "turing_machines.csv"
+    csv_filename = "BB5_table_based_machines.csv"
     print(f"Writing {len(all_results)} total machines to {csv_filename}...")
     
+    def get_modified_decider_type(decider_type, param1, param2):
+        if decider_type == 'Lp1':
+            return 'LOOP1_params_1050000'
+        if decider_type == 'NG' and param1 == 0:
+            return f'NGRAM_CPS_IMPL2_params_{param2}_{param2}_5000001'
+        if decider_type == 'NG' and param1 > 0:
+            return f'NGRAM_CPS_IMPL1_params_{param1}_{param2}_{param2}_5000001'
+        if decider_type == 'NG_LRU':
+            return f'NGRAM_CPS_LRU_params_{param1}_{param1}_5000001'
+        if decider_type == 'RWL':
+            return f'REPWL_params_{param1}_{param2}_320_150001'
+        if decider_type == 'Ha':
+            return 'HALT_DECIDER_47176870'
+        return decider_type
+
     with open(csv_filename, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile)
         
         # Write header
-        writer.writerow(['TM_Definition', 'Decider_Type', 'Param1', 'Param2'])
+        # machine,status,decider
+        writer.writerow(['machine', 'status', 'decider'])
         
         # Write data
-        for tm_def, decider_type, param1, param2 in all_results:
-            writer.writerow([tm_def, decider_type, param1 if param1 is not None else '', param2 if param2 is not None else ''])
-    
+        for tm_def, status, decider_type, param1, param2 in all_results:
+
+            modified_decider_type = get_modified_decider_type(decider_type, param1, param2)
+
+            writer.writerow([tm_def, status, modified_decider_type])
+
     print(f"CSV file created successfully!")
     print(f"Total machines processed: {len(all_results)}")
     
     # Summary by decider type
     decider_counts = {}
-    for _, decider_type, _, _ in all_results:
+    for _, _, decider_type, _, _ in all_results:
         decider_counts[decider_type] = decider_counts.get(decider_type, 0) + 1
     
     print("\nSummary by decider type:")
